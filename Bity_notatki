@@ -1,0 +1,167 @@
+Operatory bitowe:
+	- w C działają tylko na zmiennych całkowitych
+	- przesunięcia dla liczb usnigned to przesunięcia logiczne (wypełnianie zerami), dla liczb ze znakiem jest to niezdefiniowane
+	- char 1B, int 4B, long 8B
+	- gdy używasz cin do zapisu na uint8 to chcę potraktować pierwszą liczbę jako znak, więc lepiej do int i skonwertować
+	- zamiana dwóch liczb to xor tej liczby z wynikiem xor  obu tych liczb
+	-przesunięcia w lewo o n to mnożenia o 2^n, a w prawo dzielenia
+	-128 = 1000 0000
+
+Druk bitów:
+	- jedynie pierwszy ustawiony bit to 2^(liczba_bitów-1)[unisgned] lub 2^(liczba_bitów-2) [signed]
+	-Decimal: 1025
+	16 bit representation in memory:
+	
+	Big Endian: 
+	Hex: 0x0401 
+	binary: 00000100 00000001
+	Little Endian: 
+	Hex: 0x0104 
+	binary: 00000001 00000100
+	32 bit representation in memory:
+	
+	Big Endian: 
+	Hex: 0x00000401 
+	binary: 00000000 00000000 00000100 00000001
+	Little Endian: 
+	Hex: 0x01040000 
+	binary: 00000001 00000100 00000000 00000000
+
+Signed:
+	-Opracowano kilka metod zapisu liczb binarnych ze znakiem, które charakteryzują się
+	różnym stopniem przydatności, między innymi:
+	q metodę znak-moduł (ZM),
+	q metodę uzupełnień do 1 (U1),
+	q metodę uzupełnień do 2 (U2).
+	*znak-moduł:
+		- pierwsza cyfra znak, reszta normalny zapis
+		- dwa sposoby na zapis zera (ujemnych więc też jest o jeden mniej)
+		- nie można wykonowyać operacji arytmetycznych
+		- arytmetyka: 
+			- trzeba działać na modułach i zawsze w specjalny sposób traktowac arytmetykę znaków
+			- mnożenie i dzielenie najłatwiej bo znaki się xoruje
+			- dodawanie =  0+0=0, 1+1=1, różne - znak większego modułu
+			- odejmowanie: te same - znak a, jeżeli moduł większy od b, jeżeli nie to przeciwieńswo, różne - znak a
+	*U2:
+		- najstarszy bit mnożymy przez -2 do jego potęgi (an-1 * 2^(n-1)) - an-1 to pierwsza jedynka
+		- można wykonywać operacje arytmetyczne
+		zamiana dec->bin:
+			- zapisz wartosc bezwzgledna jako liczbę binarną
+			- dopełnij zerami z lewa, tak by liczba bitów była potęgą dwójki
+			- zaneguj wszystkie bity
+			- dodaj 1
+			- inny sposób = 2^(liczba_bitow) - |liczba_do_zamiany|
+	*U1:
+		- Waga bitu znakowego jest równa (-2n-1+1).
+		zamiana dec->bin:
+			- zapisz wartosc bezwzgledna jako liczbę binarną
+			- dopełnij zerami z lewa
+			- zaneguj wszystkie bity
+			- najstarszy bit musi być jedynką
+			- druga metoda: 2^(liczba_bitow)-1+ujemna_liczba_do_zamiany
+		-przy dodawaniu do wyniku należało dodać przeniesienie poza bit znaku, aby otrzymać poprawny wynik.
+		- Dodając binarnie te liczby zapisane w kodzie U1, dostaniemy liczbę oraz przeniesienie, które dodajemy do otrzymanej liczby 
+		- Aby wykonać odejmowanie wystarczy odwrócić bity drugiej liczby i tak powstałe liczby dodać.
+
+dodawanie bitowe:
+	- 1+1 = 10
+	- zawsze przenosimy 1 nie więcej
+	- w przypaku przenoszenia:
+		- 1+0=0 i przenosimy dalej
+		- 1+1=1 i przenosimy dalej
+	- nadmiar czyli np. dziewiąty bit przepada
+odejmowanie bitowe:
+	- 0-1=1 i pożyczka 1 w lewo
+	-1-1 z pożyczką = 0-1(odejmujemy pożyczkę)=1 i pożyczka 1 w lewo
+	- 0-1 z pożyczką = 1-1(odejmujemy pożyczkę)=0 i pożyczka 1 w lewo
+	- niedomiar w przypadku obliczenia liczby mniejszej od zakresu
+dzielenie bitowe:
+	- dzielna jest liczbą do podzielenia, a dzielnik u dołu
+	- zapisz dzielnik w pozycji przesuniętej na lewo, tak by zaczynał się równo z dzielną
+	- czy dzielnik jest mniejszy/równy dzielnej:
+		- TAK: zapisz 1 nad kolejną po prawo liczbą dzielnej ( zaczynając od drugiej) i odejmij dzielnik od dzielnej
+		- NIE: zapisz 0 nad kolejną po prawo liczbą dzielnej ( zaczynając od drugiej) i nie odejmuj, a przepisz dzielną dalej
+	- przesuń  o 1 w prawo bity dzielnika i powtórz kroki
+	- ostatnie odejmowanie gdy dzielnik wróci na maks. w prawo
+	- wynik ostatniego odejmowania to reszta z dzielenia (którą możemy dzielić dalej, żeby uzyskiwać kolejne liczby po przecinku)
+
+stałoprzecinkowe:
+		- stała pozycja przecinka
+		- wagi ułamków idą od -1 malejąca do najmłodszego bitu (1/2 do kolejnych potęg)
+		- zamiana liczby całkowitej na postać binarną za pomocą cyklicznego dzielenia
+		przez 2; (jesli nie ma reszty to zero, zaokrąglamy w dół, zapisujemy wynik od prawej do lewej)
+		- zamiana części ułamkowej na postać binarną za pomocą cyklicznego mnożenia
+		przez 2. Jeżeli wynik jest ≥ 1, to wyznaczony bit części ułamkowej jest także równy
+		1. Do dalszych obliczeń wykorzystuje się część ułamkową wyniku.
+		( Mnożysz ułamek *2, jeżeli wyjdzie mniej niż jeden zapisujesz 0 i zostawiasz, w przeciwnym wypadku
+		zapisz 1 i odejmij tą jedynkę, wynik zapisujesz od lewej do prawej)
+		- Działania:
+			- dodawanie w normie i odejmowanie
+			- porównania normane
+			- zamiana stałoprzecinkowa na zmiennoprzecinkowa - skonwertuj na float i przesuń tak by pozbyć się części przecinkowej
+			- mnożenie, pomnóż i przesuń w prawo o wielkość części przecinkowej
+			- dzielenie - dzielną przesuń w lewo o wlk. części ułamkowej i podziel przez dzielnik
+
+zmiennoprzecinkowe:
+	- umożliwiają obsługę większego zakresu liczb (bardzo ma-
+	łych lub bardzo dużych), jednak kosztem wolniejszego przetwarzania i mniejszej dokładności.
+	- składa się z:
+		* cechy - podstawy (p) podniesionej do potęgi, zwanej cechą lub wykładnikiem (ang. exponent, e)
+		* mantysy -  liczby stałoprzecinkowej (ang.mantissa — mantysa, m)
+	- 1FP = m*b^e
+	- Za pomocą metody uzupełnień do 2 oblicza się wartość cechy
+	- Mantysa jest najczęściej liczbą stałoprzecinkową z przedziału [1, 2)
+		- m = b3b2, b1b0 = –2b3+b2+½b1+¼b0
+	- najpierw zapisana jest cecha a potem mantysa
+	- liczba = mantysa * 2^cecha
+	- możliwy błąd zaokrąglena, utrata precyzji - jeżeli liczba wymaga więcej precyzji niż oferuje system (za krótka mantysa)
+	- wystarczy przeliczyć liczbę na system dwójkowy i obliczyć ilość bitów znaczących. Jeśli mantysa może przechować te bity, to liczba będzie przedstawiona dokładnie. 
+	Jeśli nie, mamy utratę precyzji zapisu - liczba będzie zapamiętana z zaokrągleniem.
+	- bity znaczące: od dodatnich odejmujemy pierwsze i ostatnie zera, od ujemnych pierwsze jedynki i ostatnie zera
+	- IEE 754: Single Precision (32 bity) i Double Precision (64 bity)
+	- Double Precision: 
+		- 1 bit znaku, 11 bitów cechy i 53 bity mantysy
+		- 53 bit jest zawsze ustawiony jako 1 (część całkowita)
+		- cecha excess K=1023, od wyniku odejmujemy 1023 
+		- gdy cecha to same jednyki:
+			- mantysa 0:
+				- znak+ - dodatnia nieskończoność
+				- znak- - ujemna nieskończość
+			- mantysa != 0:
+				- NotANumber (kiedy wynik nie ma sensu np. 0/0 czy pierwiastek z -1)
+		- gdy cecha to same zera:
+			- mantysa 0:
+				- znak+ -zero
+				- znak- - ujemne zero
+			- mantysa != 0:
+				- liczba zdenormalizowana - niejawny bit jest 0, wypełnaiają lukę między 0 a 1^min.cecha
+					- wykładnik dla nich to 1-K
+	- wykładnik to 2^(wlk.cechy-1)-1
+
+	- Nie porównywać floatów, bo niegdy nie wiadomo czy rozwiniecia są równe
+	- Epsilon czy różnica pomiędzy liczbami jest mniejsza lub równa epsilonowi
+	- Przeliczanie liczb na zmiennoprzecinkowe: https://github.com/gynvael/zrozumiec-programowanie-cwiczenia/tree/master/FPU-real-deal
+		- oblicz na stałoprzecinkową
+		- przesuń przecinek na pierwszy bit (do postaci notacji wykładniczej)
+		- wyliczanie cechy: K+ o_ile_bitów_przesunąłęs
+		- część całkowita mantysy staje się niejawna,a resztę zapisujesz na tylu bitach ile masz do wykorzystania
+
+		- fixed point na float i z powrotem:
+			- zrzuć na typ float i przesuń w prawo o wielkość części przecinkowej
+			- z powrotem: przedsuń w lewo o wielkość części przecinkowej i zrzutuj na typ fixed
+
+	
+https://github.com/gynvael/zrozumiec-programowanie-cwiczenia/tree/master/FPU-inf-nan-0
+https://apollo.astro.amu.edu.pl/PAD/pmwiki.php?n=Stud.UjemneZero
+
+
+zamiana hex na bin:
+ - od prawej przeksztacaj czwórki bitów
+
+co jeszcze:
+	- signed
+		-zapis
+		-operacje
+	- zadanie brithone
+	- stało i zmienno pozycyjne
+	-dzielenie
