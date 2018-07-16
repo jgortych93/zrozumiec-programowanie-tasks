@@ -1,5 +1,6 @@
 #include "hexbytearray.h"
 #include <sstream>
+#include <algorithm>    // std::sort
 
 #define MAX_LENGTH    2
 
@@ -34,7 +35,7 @@ void HexByteArray::appendNumbersToArray()
                 number = static_cast<unsigned char>(strtoul(tempString.c_str(), nullptr, 16));  // base is 0 in case of '0x'
                 tempString.clear();
 
-                byteArray.push_back(number);
+                byteArray.push_back(+number);
             }
         }
         ++i;
@@ -43,8 +44,34 @@ void HexByteArray::appendNumbersToArray()
     delete[] text;
 }
 
+void HexByteArray::divideArrayBasedOnBitsParity()
+{
+    for (vector<unsigned char>::iterator it=this->byteArray.begin(); it != this->byteArray.end(); ++it){
+        if (this->isNumberOfBitsInByteEven(+*it)){
+            //cout<<+(*it)<<endl;
+            this->bytesWithEvenNumberOfBits.push_back(+*it);}
+        else{
+            //cout<<+(*it)<<endl;
+            this->bytesWithoutEvenNumberOfBits.push_back(+*it);}
+    }
 
-char* HexByteArray::saveTextToBuffer()
+    this->orderVectors();
+}
+
+void HexByteArray::printByteVectors() const
+{
+    cout<<"Number with EVEN number of bits: "<<endl;
+    for (vector<unsigned char>::iterator it; it != this->bytesWithEvenNumberOfBits.end(); ++it)
+        cout<<+(*it)<<endl;
+
+    cout<<"Number with NOT EVEN number of bits: "<<endl;
+    for (vector<unsigned char>::iterator it; it != this->bytesWithoutEvenNumberOfBits.end(); ++it)
+        cout<<"\t"<<+(*it)<<endl;
+
+}
+
+
+char* HexByteArray::saveTextToBuffer() const
 {
     ifstream file(this->fileName);
     if(file){
@@ -70,4 +97,19 @@ char* HexByteArray::saveTextToBuffer()
 
     }
     return nullptr;
+}
+
+bool HexByteArray::isNumberOfBitsInByteEven(const unsigned char &number) const
+{
+    if ((((+number) - 1u) & 1u) != 0)
+        return false;
+    else
+        return true;
+}
+
+void HexByteArray::orderVectors()
+{
+    std::sort(this->bytesWithEvenNumberOfBits.begin(), this->bytesWithEvenNumberOfBits.end());
+
+    std::sort(this->bytesWithoutEvenNumberOfBits.begin(), this->bytesWithoutEvenNumberOfBits.end(), greater<unsigned char>());
 }

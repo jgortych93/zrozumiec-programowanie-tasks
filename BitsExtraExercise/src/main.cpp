@@ -11,6 +11,9 @@ int main()
     HexByteArray programArray(FILE_PATH);
 
     programArray.appendNumbersToArray();
+    programArray.divideArrayBasedOnBitsParity();
+
+    programArray.printByteVectors();
 
     return 0;
 }
