@@ -3,6 +3,7 @@
 #include <algorithm>    // std::sort
 
 #define MAX_LENGTH    2
+#define OUTPUT_FILE_PATH "../BitsExtraExercise/Output/Output"
 
 HexByteArray::HexByteArray(const string &fileToParseName)
 {
@@ -47,26 +48,39 @@ void HexByteArray::appendNumbersToArray()
 void HexByteArray::divideArrayBasedOnBitsParity()
 {
     for (vector<unsigned char>::iterator it=this->byteArray.begin(); it != this->byteArray.end(); ++it){
-        if (this->isNumberOfBitsInByteEven(+*it)){
+        if (this->isNumberOfBitsInByteEven(*it)){
             //cout<<+(*it)<<endl;
-            this->bytesWithEvenNumberOfBits.push_back(+*it);}
+            this->bytesWithEvenNumberOfBits.push_back(*it);}
         else{
             //cout<<+(*it)<<endl;
-            this->bytesWithoutEvenNumberOfBits.push_back(+*it);}
+            this->bytesWithoutEvenNumberOfBits.push_back(*it);}
     }
 
     this->orderVectors();
 }
 
-void HexByteArray::printByteVectors() const
+void HexByteArray::printByteVectors()
 {
-    cout<<"Number with EVEN number of bits: "<<endl;
-    for (vector<unsigned char>::iterator it; it != this->bytesWithEvenNumberOfBits.end(); ++it)
-        cout<<+(*it)<<endl;
 
-    cout<<"Number with NOT EVEN number of bits: "<<endl;
-    for (vector<unsigned char>::iterator it; it != this->bytesWithoutEvenNumberOfBits.end(); ++it)
-        cout<<"\t"<<+(*it)<<endl;
+    ofstream outputFile(OUTPUT_FILE_PATH);
+
+    if (outputFile)
+    {
+        try {
+            outputFile<<"Number with EVEN number of bits: "<<endl;
+            for (vector<unsigned char>::iterator it = this->bytesWithEvenNumberOfBits.begin(); it != this->bytesWithEvenNumberOfBits.end(); ++it)
+                outputFile<<+(*it)<<endl;
+
+            outputFile<<"Number with NOT EVEN number of bits: "<<endl;
+            for (vector<unsigned char>::iterator it = this->bytesWithoutEvenNumberOfBits.begin(); it != this->bytesWithoutEvenNumberOfBits.end(); ++it)
+                outputFile<<+(*it)<<endl;
+
+        } catch (exception ex) {
+            cout<<ex.what()<<endl;
+        }
+    }
+    else
+        cerr<<"No output file"<<endl;
 
 }
 
@@ -101,7 +115,16 @@ char* HexByteArray::saveTextToBuffer() const
 
 bool HexByteArray::isNumberOfBitsInByteEven(const unsigned char &number) const
 {
-    if ((((+number) - 1u) & 1u) != 0)
+    unsigned char mask = 1;
+    unsigned char numberOfBits = 0;
+
+    for (int i=0; i<8; ++i)
+    {
+        if (number & (mask<<i))
+            ++numberOfBits;
+    }
+
+    if (numberOfBits % 2)
         return false;
     else
         return true;

@@ -21,7 +21,7 @@ public:
     HexByteArray(const string &fileToParseName);
     void appendNumbersToArray();
     void divideArrayBasedOnBitsParity();
-    void printByteVectors() const;
+    void printByteVectors();
 
 
 private:
