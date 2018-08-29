@@ -1,0 +1,51 @@
+﻿Strings notes:
+
+	- numer jest reprezentacją konkretnego glifa w czcionce
+	- ujednolicone kody dla różnych czcionek: najpierw ascii, teraz unicode
+	ASCII: 
+		- 7 bitów (ósmy bit na znaki np. lokalne w extended ASCII)
+		
+	Unicode:
+		- kilkanaście płaszyzn po 65536 znaków
+			- pierwsza płaszczyzna podstawowa zawiera od U+0000 do U+FFFF znaków (2B)
+			- podstawowy plan jest kompatybilny z ASCII (znaki od U+00 do U+FF są takie same)
+		- różne warianty:
+			- UTF32 (stała długość, zawsze 32 bity)
+			-UTF16( zmienna, jeden lub dwa razy 16 bitów, kody większę od U+FFFF są maskowane), wykorzystwyane w Windows
+			- UTF8 (zmienna, od jeden do sześciu bajtów)
+				- pierwszy bajt określa liczbę bajtów, każdy kolejny bajt to 10 i 6 bitów kodujących
+				- wykorzystywany w linux i WEB
+		
+	- kodowania stałej liczby znaków są prostsze w obcięciu i konkatnacji, a także obliczaniu pozycji znaku w buforze bajtów
+	- UTF-8 i UTF-16 są semibezstanowe - im wyższy kod tym więcej bajtów. Konkatenacja jest równie łatwa, przycięcie nie bo nie wiadomo ile bajtów
+	miały poprzednie znaki, cięższe jest też znalezienie znaku na konkretnej pozycji
+	- UTF-16 zapisuje całą pierwszą płaszczyznę na dwóch bajtach (znaki o wlk. powyżej dwóch bajtów są maskowane) - odejmij 2^21 i podziel pozostałe 20 bitów na dwie dziesiątki) 
+
+	- klawiatura wysyła kody przetwarzane później przez na właściwe kodowanie przez API
+
+	- znaczniki BOM określają jakie kodawanie w jakim wariancie zostało użyte. Wykorzystywany jest do tego  znak niełamiącej spacji o zerowej długości. Należy używac, ale nie trzeba. Czasami widoczny 
+	jako śmieci na końcu stringu (kiedy nierozpoznany)
+
+	- char16_t - at least 16 bit string
+	-char32_t
+	-wchar_t - dowolny napis w dowolnym kodowaniu
+
+	Stringi mogą być mutowalne i niemutowalne:
+		- Mutowalne:
+			- jeden realokowany bufor
+		- Niemutowalne:
+			- za każdą zmianą tworzony jest de facto nowy obiekt
+				- łatwiejsza synchronizacja wątków
+				- kopia wymaga jedynie kopii referencji, wycięcie podciągu łatwiejsze (jedynie referencja do miejsca w ciągu)
+				- najmniejsza zmiana wymaga ponownej alokacji, część pamięci może nie byc zwolniona jeżeli gdzieś przechowujemy referencję do podciągu
+
+Nieciągłe bufory:
+	- Rope(cord) - struktura drzewiasta - łatwiejsze operacje na podiągach (wstawianie, usuwanie), wolniejsze szukanie pozycji. 
+	- Niektóre edytory tekstowe mają bufory z lukami pośrodku, które są uzależnione od pozycji kursora i wypełniają się w razie potrzeby
+
+Określanie końca ciągu:
+	- zero-terminated (like C-String[ASCIIZ])
+	- zmienna przechowująca długość
+	- Konwersja między nimi może być niebezpieczna (np. przez wstawienia znaku \0 w stringu o określonej długości podanie go jako wejście zero-terminated)
+
+Budowa stringów w poszczególnych językach to najcześciej bufor (często po prostu char[]) i jego wielkość, czasem także wielkość maksymalna bufora
