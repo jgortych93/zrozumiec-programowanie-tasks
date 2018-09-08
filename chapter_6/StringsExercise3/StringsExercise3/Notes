@@ -1,0 +1,5 @@
+The puropse of the exercise is to create own conversion from UTF-16 to UTF-8.
+
+Presumptions:
+    - create decoding the UTF-16 to Unicode sign code functionality
+    - cerate the coding Unicode sign to UTF-8 functionality
