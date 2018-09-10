@@ -11,11 +11,12 @@ class UTF16ToUTF8Converter
 
 public:
     UTF16ToUTF8Converter();
-    u16string convertToUTF8(const u16string &utf16String);
+    string convertToUTF8(const u16string &utf16String);
 
 private:
-    vector<char16_t> decodeUTF16() const;
-    void decodeMaskedSign(vector<char16_t>& codes, int iterator) const;
+    vector<uint32_t> decodeUTF16() const;
+    void decodeMaskedSign(vector<uint32_t>& codes, uint32_t iterator) const;
+    string encodeToUTF8(const vector<uint32_t>& codes) const;
 };
 
 #endif // UTF16TOUTF8CONVERTER_H
