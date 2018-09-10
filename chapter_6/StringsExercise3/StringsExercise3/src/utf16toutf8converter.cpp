@@ -12,6 +12,8 @@
 #define TEN 10u
 #define UTF16_UPPER_RANGE   0x10000u
 
+#define ASCII_UPPER_RANGE   0x7fu
+
 UTF16ToUTF8Converter::UTF16ToUTF8Converter()
 {
 
@@ -69,7 +71,27 @@ void UTF16ToUTF8Converter::decodeMaskedSign(vector<uint32_t> &codes, uint32_t it
 
 }
 
-string UTF16ToUTF8Converter::encodeToUTF8(const vector<uint32_t> &codes) const
+string UTF16ToUTF8Converter::encodeToUTF8(vector<uint32_t> codes) const
 {
+    string result = "";
 
+    vector<uint32_t>::iterator it;
+
+    for (it = codes.begin(); it < codes.end(); ++it)
+    {
+        if (*it <=  ASCII_UPPER_RANGE)
+            result += static_cast<char>(*it);
+        else
+        {
+            /*
+             * Rest of algorithm:
+             * - check the number of bits in sign code
+             * - create the Map to map ranges of bit sizes to number of bytes needed for encoding the sign in UTF8
+             * - first byte has as many ones as the needed number of bytes
+             * - rest of bytes start from 10 and then use the other 6 bits to store data
+             */
+        }
+    }
+
+    return  result;
 }

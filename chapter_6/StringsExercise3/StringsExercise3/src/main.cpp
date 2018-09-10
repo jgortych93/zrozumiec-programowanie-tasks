@@ -6,7 +6,7 @@ using namespace std;
 
 int main()
 {
-    u16string exampleString = u"This is UTF16 encoded string.";
+    u16string exampleString = u"Piktogram kota: \u0001f408";
 
     UTF16ToUTF8Converter *converter = new UTF16ToUTF8Converter();
 
