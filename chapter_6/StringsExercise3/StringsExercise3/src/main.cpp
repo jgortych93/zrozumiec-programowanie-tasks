@@ -10,7 +10,7 @@ int main()
 
     UTF16ToUTF8Converter *converter = new UTF16ToUTF8Converter();
 
-    converter->convertToUTF8(exampleString);
+    cout<<converter->convertToUTF8(exampleString)<<endl;
 
     delete converter;
 

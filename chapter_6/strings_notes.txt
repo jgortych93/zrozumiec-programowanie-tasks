@@ -13,7 +13,7 @@
 			- UTF32 (stała długość, zawsze 32 bity)
 			-UTF16( zmienna, jeden lub dwa razy 16 bitów, kody większę od U+FFFF są maskowane), wykorzystwyane w Windows
 			- UTF8 (zmienna, od jeden do sześciu bajtów)
-				- pierwszy bajt określa liczbę bajtów, każdy kolejny bajt to 10 i 6 bitów kodujących
+				- pierwszy bajt określa liczbę potrzebnych bajtów licząc zapalone bity, aż do pierwsza zera, reszta z nich jest gotowa do zapisu, każdy kolejny bajt to 10 i 6 bitów kodujących
 				- wykorzystywany w linux i WEB
 		
 	- kodowania stałej liczby znaków są prostsze w obcięciu i konkatnacji, a także obliczaniu pozycji znaku w buforze bajtów

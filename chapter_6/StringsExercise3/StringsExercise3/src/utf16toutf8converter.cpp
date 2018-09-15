@@ -1,18 +1,23 @@
 #include "utf16toutf8converter.h"
 #include <iostream>
+#include <math.h>
+#include <algorithm>
+
 #define FIRST_RANGE_START   0x0000u
 #define FIRST_RANGE_END     0xD7FFu
 #define SECOND_RANGE_START  0xE000u
 #define SECOND_RANGE_END    0xFFFFu
 #define DOWN_TEN_BITS_MASK  0x3FFFFu
 
-#define SECOND_16_BIT_NUMBER_DOWN_RANGE     0xDC00u
-#define SECOND_16_BIT_NUMBER_UPPER_RANGE    0xDFFFu
-
 #define TEN 10u
 #define UTF16_UPPER_RANGE   0x10000u
 
 #define ASCII_UPPER_RANGE   0x7fu
+#define SIX_LAST_BITS_MASK  0x3fu
+
+const map<uint8_t,uint8_t>* UTF16ToUTF8Converter::bytesRangesInUTF8 = new map<uint8_t, uint8_t>{
+    {7,1}, {11,2},{16,3},{21,4}
+};
 
 UTF16ToUTF8Converter::UTF16ToUTF8Converter()
 {
@@ -30,9 +35,9 @@ string UTF16ToUTF8Converter::convertToUTF8(const u16string& utf16String)
         cout<<decodedSigns[i]<<endl;
     }
 
-    string result = encodeToUTF8(decodedSigns);
+    vector<uint8_t> result = encodeToUTF8(decodedSigns);
 
-    return  result;
+    return  string(result.begin(), result.end());
 }
 
 vector<uint32_t> UTF16ToUTF8Converter::decodeUTF16() const
@@ -71,16 +76,16 @@ void UTF16ToUTF8Converter::decodeMaskedSign(vector<uint32_t> &codes, uint32_t it
 
 }
 
-string UTF16ToUTF8Converter::encodeToUTF8(vector<uint32_t> codes) const
+vector<uint8_t> UTF16ToUTF8Converter::encodeToUTF8(vector<uint32_t> codes) const
 {
-    string result = "";
+    vector<uint8_t> result;
 
     vector<uint32_t>::iterator it;
 
     for (it = codes.begin(); it < codes.end(); ++it)
     {
         if (*it <=  ASCII_UPPER_RANGE)
-            result += static_cast<char>(*it);
+            result.push_back(static_cast<uint8_t>(*it));
         else
         {
             /*
@@ -90,8 +95,47 @@ string UTF16ToUTF8Converter::encodeToUTF8(vector<uint32_t> codes) const
              * - first byte has as many ones as the needed number of bytes
              * - rest of bytes start from 10 and then use the other 6 bits to store data
              */
+
+            uint32_t numberOfBits = this->countBits(*it);
+            const uint8_t numberOfBytes = this->getNeededNumberOfBytes(numberOfBits);
+
+            vector<uint8_t> temporaryVector;
+            for (int i = 0; i < numberOfBytes; ++i)
+            {
+                temporaryVector.push_back((2 << 6) | (*it & SIX_LAST_BITS_MASK));
+                (*it) >>= 6;
+            }
+
+            //First byte
+            temporaryVector.push_back(static_cast<uint8_t>(((0xFFu << (8u - static_cast<uint32_t>(numberOfBytes))) & (0xFFu | static_cast<uint32_t>((*it))))));
+            reverse(temporaryVector.begin(), temporaryVector.end());
+
+            result.insert(result.end(), temporaryVector.begin(), temporaryVector.end());
+
         }
     }
 
     return  result;
+}
+
+uint32_t UTF16ToUTF8Converter::countBits(const uint32_t &number) const
+{
+
+    // log function in base 2
+    // take only integer part
+    return static_cast<uint32_t>(log2(number))+1u;
+
+}
+
+uint8_t UTF16ToUTF8Converter::getNeededNumberOfBytes(const uint32_t numberOfBits) const
+{
+    map<uint8_t,uint8_t>::const_iterator mapIterator;
+
+    for (mapIterator = bytesRangesInUTF8->begin();mapIterator != bytesRangesInUTF8->end(); ++mapIterator)
+    {
+        if (static_cast<const uint32_t>(mapIterator->first) >= numberOfBits)
+            return mapIterator->second;
+    }
+
+    return 0;
 }
