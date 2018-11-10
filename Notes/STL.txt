@@ -1,0 +1,226 @@
+STL - Standard template library - najpierw HP, potem standardowa biblioteka CPP
+
+4 główne gałęzie:
+	- algorytmy, kontenery, funkcje, iteratory, utilities
+
+Vector a tablica - znany rozmair i możliowść zmiany rozmiaru
+Algorytmy: np. minmax, binary-search, sorting
+
+Stl - to tez iostream, cout, string jest jednym z kontenerów
+
+kontenery - sekwencyjne i asocjacyjne
+
+Vector ma konstruktor domyślny i (size, val)
+a także (iterator, iterator) gdzie można dawać range z dowolnych pointerów (od pierwszego, bez ostatniego)
+
+przy push_back - kilka razy wywołuje się copy constructor, w celu skopiowania do nowej tablicy
+
+vector sam niszczy swoje elementy, ale tylko niedynamiczne
+
+dequeue - nie zawiera się w pamieci ciągłej jak tablice,wektory, ale jest dwukierunkową listą tablic
+
+Lista - jest listą dwukierunkową, a więc mniej kosztowne ziany sekwencji (bez realokacji), ale więcej pamieci na next i prev i brak operatora []
+
+iterator - iterator, const iterator, const? reverse_iterator
+
+begin, end, rbegin, rend - end zwraca końce kolekcji, puste elementy, rbegin  - to są metody wyoływane na kontenerach
+beginy odnosza się do faktycznych elementów a endy do końców
+
+towrzenie iteratorów  - z namesace danego kontenera - np. dqueue<int>::iterator
+rbegin - zwraca reverse_it
+
+assign - 2 two args funcs - iteratr range or number od assignments and value to assign
+
+clear - wszystkie destruktory, size 0
+
+splice - przenieś elementy z listy z arumentu, do listy wywołującej na danej poycji i w danym zakresie
+
+erase używa iteratorów, a remove usuwa każde wystapienie danej warotści
+
+unique - pierwsze wystąpienie elementu listy ma być jedyne, reszte usuń
+
+merge - zmerguj diwe listy - method compares the objects’ pointers with those iterators, and if the source object is less than the target, it’s removed from the source and placed in the target list at the target iterator position.
+
+lista ma kilka swoich własnych operacji, dla których wektor musi używać algorytmów ogonych - jak sort, reverse
+
+dqueue opłaca się w razie zbyt drogiego kopiowania
+
+Adaptery kontenerów: zbudowane na różnej podstawie zapewniają konkretny dostęp do elemntów
+stack, queue, priority_queue - domyslnie zbudowane na dqueue
+stack - constructor - tylko od nnego stosu lun od kontenera zadeklarowanego dla tego samego szablonu
+pop tylko usuwa ostatni element, żeby zdjąć trzeba zastosować top()
+
+priority queue - coparer zwraca true if a < b
+random access iterator
+make_heap(), push_heap(), pop_heap().
+może mieć iteratorowy konstruktor
+normalny konstruktor (comparator, containter) - obydwa z somyślnymi warotścami
+
+heap algorithm - similar to seletion sort, wstawianie operte na drzewie BST
+
+
+resize na większy zmienaia faktyczny size, reserve nie
+second w sortowaniu musi być większe, aby był ascending
+
+less to znaczy mniejsze na początku
+
+KONTENERY ASOCJACYJE:
+	- para klucz i wartość
+	- zbudowane są na podstawie drzewa BST
+	- dość szybki, ale większe pamięciowo
+	- set, multiset, map, multimap
+
+Set:
+	-	klucze i elementy są tym samym, ale są posortowane
+	- W multiset mozna wstawiać duplikaty
+	- <typ, compare (def:less),allokator)>
+	- klucze/elementy są niezmienne
+	- find zwraca iterator do podanego klucza (pierwszy dla multisetu), jak nie znalezione zwraca end
+	- erase - usuwa konkretny klucz, pozycję lub zakres
+	- zwraca 0 lub 1, lub dla multisetu liczbę usuniętyh takich samych kluczy
+	- lower_bound, upper_bound, equal_range - zwraca range (para iteratorów dla equal range pierwszy spełniający i w prawo do końca)
+	- loer_bound - iterator do pierwszego większego lub równego
+	- upperbound - iterator do pierwszego większego
+
+Map:
+	- map i multimap różnią się tak jak sety
+	- klucze są równeż niezmienne i posortowane
+	- żeby radzić sobie z sortowaniem obiektów, less musi mieć dostęp do operacji na przeładowanym operatorze mniejsze w danej klasie
+	- pair to struktura z key i value
+	- operator[] - może być używany do zmiany value jak i jej sprawdzenia, ale nie do sprawdzenia czy dany klucz istniej bo jesli nie istnieje to jest tworzona nowa para z podanym kluczem
+	- insert zwraca albo parę (iterator do i boll udało się lub nie) lub jeżeli podajemy pozycję zwraca tylko iterator do nowego lub istniejącego
+
+erase (podaj klucz w asocjacyjnych lub terator gdziekolwiek)
+
+
+
+ALGORYTMY:
+ Nod_modyfying:
+Przykłądy funkcji do wykorzystania w for_each()
+void print(int & value) //change argument to const int & value for set 
+{
+    cout<<value<<" ";
+}
+
+struct Print 
+{
+    void operator()(int & value) //change argument to const int & value for set
+    {
+        cout<<value<<" ";
+    }
+};
+podajemy sama nazwę funkcji lub nazwę typu z nawisami lub *(new typ() - wtedy tylko raz tworzy się obiekt)) 
+
+find, find_if:
+	- zwracają iterator do pierwszego wystąpienia lub end()
+	- find przyjmuje po zakresie wartość, find_if przyjmuje funckję lub operator () lub także tylko wartość
+
+search i find_end():
+	- w danym zakresie szukają innego zakresu
+	- search zwraca pierwsze wystapienie a last ostatnie
+	- mogą przyjąć funckję porównującą - zwracającą true
+distance(iterator, iterator)
+
+find_first_of():
+	- pierwsze wystapienie którejkoliek wartości z zakresu
+
+adjacent_find()
+	- zwraca pozycję jesli na nastepnej pozycji jet równy element
+count(), count_if()
+	- jak find, find_if ze zliczaniem
+
+mismatch
+	- poszukuje róznic w dwóch zakresach
+	- zwraca pare iteratorów do tych dwóch zakresów
+	- oba iteratory równają się end zakresów w razie gdy kontenery są identyczne
+	- 3 podstawowe argumenty: first1, last1, iterator do pierwszego elementu drugiego zakresu
+equal()
+	-  to samo co mismatch zwracającego true w przypadku gdy zbiory są takie same
+search_n ():
+	- args: itfirst, itlast, ilerazy, co)
+	- zwraca end jeżeli nie znaleziono lub iterator do pierwszego wystąpienia
+
+Modifying operators:
+	- copy(first,last,start_here)
+		- pamięc musi byc zaalokowana, last jest pomijane
+		- zwraca iterator do ostatniego wstawionego plus jeden
+	-copy_backward:
+		-zaczyna od last-1 i wkleja idąc do tyłu od dlast-1
+
+	The first function (swap) simply exchanges the values between the two objects passed by reference. - jakielkowoiek nie tylko kontenery i można swapowac różne typy kontenerów, first i last muszą być tego saego typu
+
+	The second function (swap_ranges) exchanges the elements between entire ranges. - 3 arg
+
+	The third function (iter_swap) is very similar to the first one, but instead of references, it accepts iterators as its arguments. - zamienia wartości iteratorów
+
+	- Transform:
+		- dwa warianty (first1, last1, output1, unary_op)
+		- (first, last1, second1, output1, binary_op) - set nie może być outputem
+
+	- replace, replace_if
+		- (first1, last1, old_val, new_val) lub (first1, last1, unary_op, new_value)
+
+	- fill(first,last,value), fill_n(first, count,value)
+	
+	- genareate(first, last, funckja) , generate_n
+
+	- remove, remove_if - podobne do replace tyle że usuwanie
+
+	- unique, uniqe_copy - usuwa duplikaty na podsawie == lub predykatu
+		- unique usuwa je w źródle, a uniqe_copy w trzecim argumencie jakim jest first2
+		- po usnięciu nastepuje sklejenie, size się nie zmienia, brakujące elementy są wypełaniane zerami
+
+	- reverse i reverse_copy - tu jasne
+
+	- rotate - tylko dla kontenerów
+		- (first, last, new_first) - nowy first, te przed firstem trafiają na koniec
+
+	- random_shuffle(first, last, opcjonalnie - randomnumbersgenerator)
+
+	- partition, stable_partition - tylko kontenery
+		- zwraca iterator do podziału zakresu na dwa różne zakresy <od trzeciego argumentu i >= od trzciego argumentu
+		- stable zawsze zachowuje kolejność sprzed podziału, a normalny nie zawsze
+
+--reverse_iterator - idź do przodu
+
+Algorytmy sortowania:
+	
+	- sort, stable_sort: vecctor, deque, array
+		- sortowanie bąbelkowe w kolejności niemalejącej
+		- 2 agumenty (randomaccessIterators), albo jeszczeci trzeci - komparator (if a<b return true;)
+		- stable_sort ma za zadanie zachować porządek w kolejności równych elementów
+
+	- lower_bound, analogicznie upper_bound(ten sam komparator) i equal_range(zwraca parę lower_boudn,upper_bound lub lasty):
+		- (ForwardIt1, ForwardIt2, T value, opcjonalnie comparator comp (typ_z_akresu, T))
+		- zwraca iterator do pierwszego niemniejszego od value elementu (lub last) na podstawie less lub comp
+		- wszystkie działają na posrtowanych zakresach, jak nieposortowany to zwraca last
+
+	- binary_search (ForwardIt1, ForwardIt2, val, comp)
+	- zwraca bool
+	- operuje tylko na posortownych
+
+Algorytmy mergowania: działają na posortowanych zakresach
+	- merge: compatibillity all
+		- merguje dwa posortowane zakresy w jeden posrtowany używając less lub own comparator
+
+	- inplace_merge: wszystkie
+		- merguje dwa zakresy (first, middle, end) w jednym kontenerze (de facto sortuje kontener)
+
+	- includes (first1,last1,first2,last2,opcjonalnie comp(def less))
+		- zwraca true jeżeli drugi zakres mieści sie w pierwszym (comparator musi być taki sam jaki był wykorzystany przy sortowaniu)
+
+	- set_union, set_intersection, set_difference, set_symmetric_difference (first1, last1, t, last2, outputfirst, comp) - porządek ekwiwalentów jest zachowany
+		- set_union - dwa zakresy są łączone w jeden 9suma zbiorów) - duplikaty są usuwane
+		- set_intersection - zapisz część wspólną
+		- set_difference - elementy z jedynki, których nie ma w 2
+		- set_symetrical_difference- symetrycznie elementy niewspólne
+
+	min,max i min_element(it1, it2), max_elemnt(it1,it2)
+		- zwracacją min ub max w oparciu o less lub own comp
+
+
+random_access iterators -> biderectional_iterators->forward_ierators-> input and output_iterators
+radom_access - defaul for vector and deques, allows for []
+bideroctional - could be decremented, lists and associative containers
+forward - tylko inkrementacja
+input - nie można zmieniać, output - można zmieniać

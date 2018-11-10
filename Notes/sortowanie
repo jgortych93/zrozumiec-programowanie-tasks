@@ -1,0 +1,96 @@
+Algorytmy sortujące:
+
+bąbelkowe - zamiana miejscami sąsiadujących elementów.
+- Złożoność O(n^2) - dla tablic doyś dobra bo mały narzut pamięci O(1)
+- Z każdym przejściem pętli sprawdzamy podtablicę o jeden mniejszą
+- jezeli dla jednej z podtablic nie było zamiany to można już przerwać
+
+for (int i=0; i < rozmiar-1;++i)
+
+	swapped = false;
+	for (int j=0; j<rozmiar-1-i;++j)
+		if (tab[i]<tab[i+j])
+			swap(tab..
+			swapped = true
+
+	if (!swapped)
+		break;
+
+selection sort:
+złozoność - O(n^2)
+Znajdź najmniejszy/największy element tablicy i wstaw go na pocz/kon
+w każdej iteracji zmniejszaj podtablicę
+Sortowanie niestabilne - w trackie wykonywania algorytmu elementy na własciwych miejsach mogą być przesuwane
+- przyspieszenie polega na wypełnianiu obu końców 
+
+Insertion sort:
+- stabiny 
+- efetywneiejszy od bubble i selection - bo stabilny i bo lepszy dla tablic wstępnie posortowanych
+- złozoność O(n^2) czasowa, pamięciowa O(1)
+- może być zoptymalizowany przez wyszukiwanie binarne (divide and conquer w etapie przechodzenia po podciągu) - zmniejsza liczbę porównań do O(nlogn) - znajdź w posortowanej tablicy
+- Zaczynam od pierwszego elementu i porównuje go z podciągiem pod sobą ( dopóki eleementy są większe to przesuwam je o jedne miejsce w prawo, jeżeli nie są to wstawiam na miejsce [j+1])
+
+sortowanie kubełkowe (bucket sort):
+- na podstawie kryterium liczyb trafiają do kubełka, kubełki są sortowane, a potem scalane
+- w przypadku pesymiestycznym O(n^2), złozoność pamięciowa O(n) na kubełki
+- optymistyczne O(n) gdy liczby w przedziałach są rozłożone jednostajnie - gdy ich nie trzeba sortować to tylko trafają do przedziału
+- zazwyczaj sortowane liczby z przedziału od 0 do 1
+- przydizelaj do np. 10 kubełków w zależności od np. tego czy ich dziesięciokrotność wynosi tyle samo (na int)
+
+counting sort:
+ - nie do wszystkiego się nadaje
+- jest plusem kiedy jest jak wiele powatarzających się wartości
+- sortowanie polega na utworzeniu struktury pomocniczej reprezentującej każdy wyestępujący element (hash idealny)
+- potem jedynie wypisujemy daną wartość w tylu powtórzeniach ile zliczyliśmy
+- złożoność O(n) czasowa lub O(n+k) - gdzie k to rozpiętość max - + 1, pamięciowa tyle ile wystęuje rodzajów elementów, pamieciowa  O(n) czasowa lub O(n+k)
+- pamięć potrzebna jedynie tyle ile jest na strukturę tymczasową
+
+Radix sort - sortowanie pozycyjne:
+- kiedy chcemy sortowac wedle większej liczby kryteriów (np. imiona i nazwiska lub datę)
+- każda pozycja na której nam zależy w rekordzie sortowana wybranym algorytmem (ale stabilnym)
+-  Złożoność obliczeniowa jest równa  O(d(n+k)), gdzie { k} k to liczba różnych cyfr, a {d} d liczba cyfr w kluczach. Wymaga O(n+k) dodatkowej pamięci.
+
+quicksort:
+- złożoność czasowa średnia O(nlogn)
+- rekurencyjnie sorujemy wg. agorytmu divide and conquer
+- wybór punktu środkowego i przerzucanie wartośći mniejszych ponizej a większych powyżej (i i j zmierzają do siebie dopóki nie napotamy jakiejś wartości nie na miejscu, if (i < j) to swap
+
+q = partition (tab, l, r)
+quicksort (tab, l, q)
+quicksort(tab, q+1, r)
+
+partition (tab, i, j)
+{
+
+do 
+{
+	while (tab[i]) < środek
+		i++;
+
+	while (tab[j] > środek)
+		j--;
+	
+	if (i<j)
+		swap(tab[i], tab[j]); i przejdź dalej
+
+}while ( i < j)
+
+return j;
+}
+
+lub 
+do 
+{
+	while (tab[i]) < środek
+		i++;
+
+	while (tab[j] > środek)
+		j--;
+	
+	if (i<j)
+		swap(tab[i], tab[j]); i przejdź dalej
+
+}while ( i < j)
+
+quicksort(tab, l, j)
+quicskort(tab, i, r)
