@@ -1,0 +1,89 @@
+Git Notatki:
+
+inne systemy wersji -(np. CVS, Subversion) przechwują pliki i listę zmian do nich w każdej wesji (jak changesety).
+Git przechowuje dane jako ZESTAW MIGAWEK.  W danej wersji zapisywany jest obecny stan. Oszczędność polega na tym, że plik jest fizycznie zapisany w wersji tylko jeżeli był zmieniony, jeżeli nie to przechwuje
+referencje do ostaneij niezmienionej wersji pliku.
+Inne przewagi:
+	- w Gicie większość operacji jest lokalna - szybciej np. przeglądać historię
+	- Git tworzy własną mapę - kluczami są sumy kontrolne w SHA-1 a wartościami zawartości plików
+
+Git przewouje pliki w trzech stanach:
+	- jeżeli pik w jakiejś wersji znajduje się w repo to jest zatwierdzony
+	- zmodyfikowany - są zmiany, ale nie ma dodania do przhowalni
+	-  sledzony - zmiany są zatwierdzen do następnego commitu, są w przechowlni - git add dodaje do plików śledzonych
+
+Git ma 3 gówne katalog:
+	- katalog roboczy
+	- katlog .git - metadane i baza danych
+	- przechwoalnia (zwyle w .git) z migawkami do nast. comitu
+
+git conig - konfiguracja (np.global lub local) - mail, username, edytor tekstu, merge.tool)
+
+.gitignore - proste wyr. regularne [abc], *[0-9]
+	
+- git diff pokazuje zmiany niebędące w poczekalni, git diff -staged zmiany będą w poczeklani (w stosunku do aktualnej migawki)
+- git commit -m z opistem
+- git commit -a dodaje do poczekalni wszystkie zmodyfikowane pliki
+
+	- git rm 
+		- usuwa z poczeklani, a także z katoalogu roboczego
+		- nastepnie dodaje do poczeklanie operację usunięcia
+		- samo usuwanie z poczekalni to git rm --staged albo git reset HEAD <file>
+
+	- git mv - zmiana nazwy - usunięcie starego i dodanie nowego
+
+	- git log - przeglądania historii
+		- domyslnie pokazuje commity i podst. info. o nich w koljenosci od najnowszego
+		- wiele przeł (-p pokaz zmiany w plikach)
+
+Wycofywanie zmian:
+	- git commit --ammend - poprawka ostatiego commita
+
+	- cofnięcie lokalnych zmian (undo) git checkout -- <file>
+
+Zdalne repo:
+
+	- git remote -add.-rm/-rename - wyświetla serwery
+	- origin to domyślna nazwa serwera, z którego się klonowało
+	Ściągane ze zdalnego repo: 
+		- git fetch serwer - pobiera wszystkie zmiany, których nie masz
+		- git pull serwer - poibera zmiany i auto merguje
+	Wypchanie:
+		- git push serwer branch
+
+- git tag - tworzenie etykiet
+
+Gałęzie:
+Commity zawsze mają wskaźnik na bezpośredniego przodka
+HEAD - wkaźnik na aktualną gałąź
+git branch name - tworzy nowy brach
+git chekout branchname - przełącza się do tej gałęzi
+Branche tworza nowe wskaźniki na daną migawkę (commit)
+
+Branche to tylko pojedyncze pliki - więc bardzo szybko mozna je tworzyć (bez kopiowania plików)
+
+- git branch -d - usunięcie
+
+SCALANIE:
+	- przełącz się na branch, do którego chcesz scalić i odpal git merge branchktorychceszscalic
+	- jeżeli po drodze nie było żadnych rozgałęzień jedynie przyswany jest wskaźnik gałęzi do przodu (scalanie Fast Forward)
+	- jeżeli nie da się przesunąć fast forward to jest scalanie trojstronne (przy wykorzystaniu migawek najnowych ze salancych branchy i wspólnego przodka), tworzony jest wtedy nowy commit mergujacy
+
+KONFLIKTY:
+ - ========== rozdziela wersję z obecnej gałeżi  na górze i wersje drugą
+- konflikt uznaje się za rzowiązany kiedy skonflikowany plik zostaje dodaeny do poczekalni
+
+ZDANE GAŁĘZIE:
+	- nie ma automatycznej synchroznizacji gałęzi loalnych i zdalnyc
+	- mogą one być od siebie niezależne
+	- git push origin master - wypchnij mój master na zdalny o tej sasmej nazwie
+	- git push origin master:newbranch - wypchnij mój master do nowostworzonej gałęzi newbranch
+	- ściągająć repo nietworzą ci się automatycznie lokalne gałęzie do pracy ze zdalnymi
+	
+	- git checkout -b newbranchname server/branchname - tworzenie gałęzi śledzącej
+	- gałezie śledzące automatycznie pusuja i pullują do do gałęzi śledzonej
+	- automatyczie tworzona jest zawsze gałąź master, które śledzi origin/master
+
+ 
+
+
