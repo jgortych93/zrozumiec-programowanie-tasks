@@ -12,16 +12,33 @@ kontenery - sekwencyjne i asocjacyjne
 
 Vector ma konstruktor domyślny i (size, val)
 a także (iterator, iterator) gdzie można dawać range z dowolnych pointerów (od pierwszego, bez ostatniego)
+jest jeszcze kontruktor kopiujacy od innego 
+
+Przy każdym wstawieniu nastepuje realokacja i wywołania copy constructorów
+przy implcict conversion najpierw zostaje utowrzony obiekt tymczasowy a następnie zostaje skopwiowany
 
 przy push_back - kilka razy wywołuje się copy constructor, w celu skopiowania do nowej tablicy
 
 vector sam niszczy swoje elementy, ale tylko niedynamiczne
 
-dequeue - nie zawiera się w pamieci ciągłej jak tablice,wektory, ale jest dwukierunkową listą tablic
+dequeue - nie zawiera się w pamieci ciągłej jak tablice,wektory, ale jest dwukierunkową listą tablic( nie ma potrzeby realokacji, tylko dokłada sie kolejną tablicę)
+- nadal używa Random Access Iterator
+- operacje dodawania i usuwania z obu stron
+- domyslna podstawa dla stack i queue
+
+Vector jest zazwyczaj szybszy od listy(oprócz bardzo drogiego kopiowania) ze względu na działanie optymalizacji. Jednak iteratory wskazują na złą pamięć przy każdej realokacji wektora.
+Szybkość wynika ze znacznie szybszego przeszukiwania liniowego i z użycia cache
 
 Lista - jest listą dwukierunkową, a więc mniej kosztowne ziany sekwencji (bez realokacji), ale więcej pamieci na next i prev i brak operatora []
 
 iterator - iterator, const iterator, const? reverse_iterator
+Mozna używać iteratorów róznych typów kontenerów ponieważ istnieje nadrzędna struktura dla iteratorów.
+
+random_access iterators -> biderectional_iterators->forward_ierators-> input and output_iterators
+radom_access - defaul for vector and deques, allows for []
+bideroctional - could be decremented, lists and associative containers
+forward - tylko inkrementacja
+input - nie można zmieniać, output - można zmieniać
 
 begin, end, rbegin, rend - end zwraca końce kolekcji, puste elementy, rbegin  - to są metody wyoływane na kontenerach
 beginy odnosza się do faktycznych elementów a endy do końców
@@ -29,7 +46,29 @@ beginy odnosza się do faktycznych elementów a endy do końców
 towrzenie iteratorów  - z namesace danego kontenera - np. dqueue<int>::iterator
 rbegin - zwraca reverse_it
 
-assign - 2 two args funcs - iteratr range or number od assignments and value to assign
+hierarchy: input & output iterator -> forward_iterator -> bidir. iterator -> RandomAccessIterator
+
+assign - 2 two args funcs - iteratr range or number od assignments and value to assign - all old value to be removed
+erase - usuń wartości na pozycji
+clear - usuń wszystko
+insert - włóż na pozycję, lub włóż zakres
+swap  - zamień dokładnie takie same ontenery
+push_back - wstaw (dla deque zawsze uszkodzenie iteratorów, pop_back - usuń ostatni element, back()-zwórć ostatni element 
+to samo z pop_front i front
+splice - to source moved from destination
+merge
+sort() - default ascending
+reverse() 
+
+tylko lista:
+remove(value) - removes all values
+remove_if(predicate) - unary, bool true if to be removed
+uniqe() - usuń powtórzenia(drugie wartości),
+
+predykaty: wskaźniki na funkcję (same nazwy funkcji) lub przeładowane operatory ()
+
+operator [] - nie sprawdza zgodności indexu, może zwrócić śmieci, at() - zwraca 
+obydwa to tak na prawdę [], więc tylko vector i deque
 
 clear - wszystkie destruktory, size 0
 
@@ -39,22 +78,28 @@ erase używa iteratorów, a remove usuwa każde wystapienie danej warotści
 
 unique - pierwsze wystąpienie elementu listy ma być jedyne, reszte usuń
 
-merge - zmerguj diwe listy - method compares the objects’ pointers with those iterators, and if the source object is less than the target, it’s removed from the source and placed in the target list at the target iterator position.
+merge - zmerguj diwe listy - method compares the objects’ pointers with those iterators, and if the source object is less than the target, it’s removed from the source and placed in the target list at the target iterator position (inserted not replaced!)(and removed form source list).
 
 lista ma kilka swoich własnych operacji, dla których wektor musi używać algorytmów ogonych - jak sort, reverse
 
 dqueue opłaca się w razie zbyt drogiego kopiowania
 
-Adaptery kontenerów: zbudowane na różnej podstawie zapewniają konkretny dostęp do elemntów
-stack, queue, priority_queue - domyslnie zbudowane na dqueue
-stack - constructor - tylko od nnego stosu lun od kontenera zadeklarowanego dla tego samego szablonu
-pop tylko usuwa ostatni element, żeby zdjąć trzeba zastosować top()
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-priority queue - coparer zwraca true if a < b
-random access iterator
+Adaptery kontenerów: zbudowane na różnej podstawie zapewniają konkretny dostęp do elemntów
+stack, queue, priority_queue - domyslnie zbudowane na dequeue
+queue - ma front i back
+constructor - tylko kopiujący lun od kontenera typów takich jak w stosie
+priority queue - tylko random access iterator
 make_heap(), push_heap(), pop_heap().
 może mieć iteratorowy konstruktor
 normalny konstruktor (comparator, containter) - obydwa z somyślnymi warotścami
+i konstruktor z iteratorami
+
+top - wywołuje front
+UWAGA! - dla domyślnego less, najemniejsze są na końcu, więc top daje największe
 
 heap algorithm - similar to seletion sort, wstawianie operte na drzewie BST
 
@@ -64,6 +109,10 @@ second w sortowaniu musi być większe, aby był ascending
 
 less to znaczy mniejsze na początku
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 KONTENERY ASOCJACYJE:
 	- para klucz i wartość
 	- zbudowane są na podstawie drzewa BST
@@ -72,6 +121,7 @@ KONTENERY ASOCJACYJE:
 
 Set:
 	-	klucze i elementy są tym samym, ale są posortowane
+	- nie można zmieniać elemntów
 	- W multiset mozna wstawiać duplikaty
 	- <typ, compare (def:less),allokator)>
 	- klucze/elementy są niezmienne
@@ -79,23 +129,34 @@ Set:
 	- erase - usuwa konkretny klucz, pozycję lub zakres
 	- zwraca 0 lub 1, lub dla multisetu liczbę usuniętyh takich samych kluczy
 	- lower_bound, upper_bound, equal_range - zwraca range (para iteratorów dla equal range pierwszy spełniający i w prawo do końca)
-	- loer_bound - iterator do pierwszego większego lub równego
+	- lower_bound - iterator do pierwszego większego lub równego
 	- upperbound - iterator do pierwszego większego
-
+	https://onlinegdb.com/H1PeoKBSN
+	- bideroctional iterator
+	
 Map:
 	- map i multimap różnią się tak jak sety
 	- klucze są równeż niezmienne i posortowane
 	- żeby radzić sobie z sortowaniem obiektów, less musi mieć dostęp do operacji na przeładowanym operatorze mniejsze w danej klasie
-	- pair to struktura z key i value
+	- pair to struktura z key i value - tworzenie nowej pair to po prostu np. pair<int,int>(10,10)
+	- pair<const Key, T>
 	- operator[] - może być używany do zmiany value jak i jej sprawdzenia, ale nie do sprawdzenia czy dany klucz istniej bo jesli nie istnieje to jest tworzona nowa para z podanym kluczem
 	- insert zwraca albo parę (iterator do i boll udało się lub nie) lub jeżeli podajemy pozycję zwraca tylko iterator do nowego lub istniejącego
+	- find zwraca iterator do pierwszych wystąpień
+	- biderioctonal iterator
 
-erase (podaj klucz w asocjacyjnych lub terator gdziekolwiek)
+erase (podaj klucz w asocjacyjnych lub iterator gdziekolwiek)
 
+it = std::next( s.begin(), k );
+but you need to be aware this will increase the iterator k times. 
 
-
+RandomAccessIterators -the one in which you can perform pointer arithmetics (couninous memory space)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALGORYTMY:
  Nod_modyfying:
+
 Przykłądy funkcji do wykorzystania w for_each()
 void print(int & value) //change argument to const int & value for set 
 {
@@ -109,7 +170,7 @@ struct Print
         cout<<value<<" ";
     }
 };
-podajemy sama nazwę funkcji lub nazwę typu z nawisami lub *(new typ() - wtedy tylko raz tworzy się obiekt)) 
+podajemy sama nazwę funkcji lub nazwę typu z nawisami lub *(new typ() - wtedy tylko raz tworzy się obiekt) - czyli podajemy obiekt, ne wskaźnik)
 
 find, find_if:
 	- zwracają iterator do pierwszego wystąpienia lub end()
@@ -117,40 +178,50 @@ find, find_if:
 
 search i find_end():
 	- w danym zakresie szukają innego zakresu
-	- search zwraca pierwsze wystapienie a last ostatnie
+	- search zwraca pierwsze wystapienie a find_end ostatnie
 	- mogą przyjąć funckję porównującą - zwracającą true
+
 distance(iterator, iterator)
 
 find_first_of():
-	- pierwsze wystapienie którejkoliek wartości z zakresu
+	- pierwsze wystapienie którejkoliek wartości z drugiego zakresu
 
 adjacent_find()
 	- zwraca pozycję jesli na nastepnej pozycji jet równy element
+
 count(), count_if()
 	- jak find, find_if ze zliczaniem
 
 mismatch
 	- poszukuje róznic w dwóch zakresach
 	- zwraca pare iteratorów do tych dwóch zakresów
-	- oba iteratory równają się end zakresów w razie gdy kontenery są identyczne
 	- 3 podstawowe argumenty: first1, last1, iterator do pierwszego elementu drugiego zakresu
+
 equal()
 	-  to samo co mismatch zwracającego true w przypadku gdy zbiory są takie same
+
 search_n ():
 	- args: itfirst, itlast, ilerazy, co)
 	- zwraca end jeżeli nie znaleziono lub iterator do pierwszego wystąpienia
 
+quiz 5:
+- w jednym namepsace nie można nazwy zmiennej taiej samej jak nazwy metody
+- find_if - może przyjmować argumenty takie same jak find
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 Modifying operators:
+
 	- copy(first,last,start_here)
 		- pamięc musi byc zaalokowana, last jest pomijane
 		- zwraca iterator do ostatniego wstawionego plus jeden
 	-copy_backward:
-		-zaczyna od last-1 i wkleja idąc do tyłu od dlast-1
+		-zaczyna od last-1 i wkleja idąc do tyłu od dlast-1 (kopiwoanie od tyły i wklejanie od tyłu)
 
 	The first function (swap) simply exchanges the values between the two objects passed by reference. - jakielkowoiek nie tylko kontenery i można swapowac różne typy kontenerów, first i last muszą być tego saego typu
-
 	The second function (swap_ranges) exchanges the elements between entire ranges. - 3 arg
-
 	The third function (iter_swap) is very similar to the first one, but instead of references, it accepts iterators as its arguments. - zamienia wartości iteratorów
 
 	- Transform:
@@ -161,14 +232,19 @@ Modifying operators:
 		- (first1, last1, old_val, new_val) lub (first1, last1, unary_op, new_value)
 
 	- fill(first,last,value), fill_n(first, count,value)
-	
+	fill przypisuje tą samą wartość z trzeciego argumentu
+	generate przypisuje wartość powrotu z podanej unarnej funkcji - funkcja TypKontenera gen(); - BEZ ARGUMENTU
+	wariany n zamiast zakrestu mają first i count	
+
 	- genareate(first, last, funckja) , generate_n
 
 	- remove, remove_if - podobne do replace tyle że usuwanie
+	Usuwa wszystkie wystapienia i 'zasklepia' puste miejsca
 
-	- unique, uniqe_copy - usuwa duplikaty na podsawie == lub predykatu
+	- unique, uniqe_copy - usuwa duplikaty będące obok siebie na podsawie == lub predykatu
 		- unique usuwa je w źródle, a uniqe_copy w trzecim argumencie jakim jest first2
-		- po usnięciu nastepuje sklejenie, size się nie zmienia, brakujące elementy są wypełaniane zerami
+		- po usnięciu nastepuje sklejenie, size się nie zmienia, brakujące elementy są wypełaniane zerami (także w kopiach) - kopie tworzone w tym samym size
+		- zwraca itrator do nowego zakresu (do pierwszego doklejonego zera)
 
 	- reverse i reverse_copy - tu jasne
 
@@ -176,12 +252,21 @@ Modifying operators:
 		- (first, last, new_first) - nowy first, te przed firstem trafiają na koniec
 
 	- random_shuffle(first, last, opcjonalnie - randomnumbersgenerator)
+		- tylko random access iterators
 
 	- partition, stable_partition - tylko kontenery
 		- zwraca iterator do podziału zakresu na dwa różne zakresy <od trzeciego argumentu i >= od trzciego argumentu
+			-przed predykatem spełniające true, po false
 		- stable zawsze zachowuje kolejność sprzed podziału, a normalny nie zawsze
+		- mogą zmieniać kolejność
 
---reverse_iterator - idź do przodu
+--reverse_iterator - do przodu idzie w kierunu odwrotnym
+różne typy iteratorów na wejścia - zwracać uwagę
+runtime error może wystapić przy kopiowaniu
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Algorytmy sortowania:
 	
@@ -189,25 +274,35 @@ Algorytmy sortowania:
 		- sortowanie bąbelkowe w kolejności niemalejącej
 		- 2 agumenty (randomaccessIterators), albo jeszczeci trzeci - komparator (if a<b return true;)
 		- stable_sort ma za zadanie zachować porządek w kolejności równych elementów
+		- sort - O(n log n), stable - O(o log2 n)
+			- czy sort to inserton sort z binary search?
 
 	- lower_bound, analogicznie upper_bound(ten sam komparator) i equal_range(zwraca parę lower_boudn,upper_bound lub lasty):
 		- (ForwardIt1, ForwardIt2, T value, opcjonalnie comparator comp (typ_z_akresu, T))
 		- zwraca iterator do pierwszego niemniejszego od value elementu (lub last) na podstawie less lub comp
 		- wszystkie działają na posrtowanych zakresach, jak nieposortowany to zwraca last
+		- lowerbound - zwraca do equal lub false, a upper_bound do true
 
 	- binary_search (ForwardIt1, ForwardIt2, val, comp)
-	- zwraca bool
-	- operuje tylko na posortownych
+		- zwraca bool
+		- operuje tylko na posortownych
+		- O(log n)
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 Algorytmy mergowania: działają na posortowanych zakresach
 	- merge: compatibillity all
 		- merguje dwa posortowane zakresy w jeden posrtowany używając less lub own comparator
 
 	- inplace_merge: wszystkie
-		- merguje dwa zakresy (first, middle, end) w jednym kontenerze (de facto sortuje kontener)
+		- merguje dwa posortowane zakresy (first, middle, end) z jednego kontenera
 
 	- includes (first1,last1,first2,last2,opcjonalnie comp(def less))
 		- zwraca true jeżeli drugi zakres mieści sie w pierwszym (comparator musi być taki sam jaki był wykorzystany przy sortowaniu)
+		- czy wszystkie elementy drugiego zakresu wystepują w pierwszym w tej samej kolejności, ale niekoniecznie w tym samym składzie
 
 	- set_union, set_intersection, set_difference, set_symmetric_difference (first1, last1, t, last2, outputfirst, comp) - porządek ekwiwalentów jest zachowany
 		- set_union - dwa zakresy są łączone w jeden 9suma zbiorów) - duplikaty są usuwane
@@ -215,12 +310,292 @@ Algorytmy mergowania: działają na posortowanych zakresach
 		- set_difference - elementy z jedynki, których nie ma w 2
 		- set_symetrical_difference- symetrycznie elementy niewspólne
 
-	min,max i min_element(it1, it2), max_elemnt(it1,it2)
+	min,max i min_element(value1, value2), max_elemnt(it1,it2)
 		- zwracacją min ub max w oparciu o less lub own comp
+		- min,max zwracają wartości, a element zwracają ForwardIterator
+		- kontener nie musi być posortowany
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilites:
+
+Functional operators (<functional>)
+Every STL functional operator is derived from a specific base class:
+
+Any class with overloaded () operator becomes functor
+
+unary_function – for unary operators,
+binary_function – for two-argument operators.
+
+aritmethical example:
+transform(l1.begin(), l1.end(), l2.begin(), l3.begin(), plus<int>());
+
+comparsion functional operators:
+less <int> l;	
+	less_equal <int> le;
+	greater <int> g;
+	greater_equal <int> ge;
+	equal_to <int> e;
+	not_equal_to <int> ne;
+
+bind1st, bind2nd:
+	- binder1st<Operation> bind1st(Operation op, T& x)
+	- transforms binary_operation to unary_operation where first argument is set to x
+	- for example using plus<> where on of the operand is still the same
+	- transform(l1.begin(), l1.end(), l2.begin(),  bind1st(plus<double>(), 10) );
+	- transform(l1.begin(), l1.end(), l2.begin(),  bind2nd(plus<double>(), 10) );
+	- int counterL2 = count_if (l2.begin(), l2.end(), bind1st(equal_to<int>(),1) );
 
 
-random_access iterators -> biderectional_iterators->forward_ierators-> input and output_iterators
-radom_access - defaul for vector and deques, allows for []
-bideroctional - could be decremented, lists and associative containers
-forward - tylko inkrementacja
-input - nie można zmieniać, output - można zmieniać
+template <class Arg, class Result>
+       pointer_to_unary_function<Arg,Result> ptr_fun (Result (*f)(Arg));
+
+template <class Arg1, class Arg2, class Result>
+       pointer_to_binary_function<Arg1,Arg2,Result> ptr_fun (Result (*f)(Arg1,Arg2));
+
+- The function ptr_fun() converts the given function f into an equivalent function object. 
+	This function is especially useful in combination with bind1st() and bind2nd(), which require a function object as an argument.
+
+binary_op musi być z () jeżeli strcut/class
+operatory przyjmowane do transform muszą mieć const argumenty
+klasy o jednym atrybucie nie potrzebują przeładowanych operatórów przy użyciu na nich functional operators
+
+Casting overloading makes using f.e. minus possible without overloaded minus
+https://www.learncpp.com/cpp-tutorial/910-overloading-typecasts/
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ADVANCED INPUT/OUTPUT:
+	Streams: channnel to byte communication
+
+	The STL input/output library provides three families of streams for use:
+		console/terminal streams – for console input/output (console means keyboard and text display);
+		file streams – to read data from files and write data to files;
+		string streams – which treat the string as a data source or data destination.
+
+	hierarchy: ios_base->ios->
+	1 level: console streams (i, o, io)
+	2: level file streams (if, of, f) && string stream (istring, ostring, string)
+
+	All types has operator << *The same refers to istream
+	ostream& operator<< (bool val);
+	ostream& operator<< (short val);
+	ostream& operator<< (unsigned short val);
+	ostream& operator<< (int val);
+	ostream& operator<< (unsigned int val);...
+
+	In the case of an error, the badbit flag is set (which can be checked with the member bad). 
+	Also, depending on the values set through member exceptions, this may cause an exception of type ios_base::failure to be thrown.
+
+	ostream& operator<< (ostream& out, char c );
+	ostream& operator<< (ostream& out, signed char c );
+	ostream& operator<< (ostream& out, unsigned char c ); 
+	ostream& operator<< (ostream& out, const char* s ); // cstrings
+	ostream& operator<< (ostream& out, const signed char* s );
+	ostream& operator<< (ostream& out, const unsigned char* s );
+	In the case of these two types, the operators are defined as global functions. 
+
+	The actual output formatting of the value being put into the stream depends on the status of the output stream. This status is defined by its flags being set or unset, either directly (through methods) or indirectly (with the help of manipulators).
+
+	extern std::ostream cout;
+	cout is ostream object that handles stdout.
+
+	ostream methods:
+	put:
+		ostream& put ( char c );
+		This method inserts exactly one character into the output stream. 
+		cout.put(s[i]);
+
+
+	Input/output formatting can be achieved by altering the state of the input or output stream.
+
+	This alteration can be done in three ways:
+
+	using the stream methods;
+	using flags;
+	using input/output manipulators.
+	
+	The general rule is that the functionality offered by manipulators is equivalent to that offered by a combination of flags and stream methods.
+
+	width:
+		streamsize width ( ) const;
+		streamsize width ( streamsize wide ); - changes width
+	Both versions return a value of width previously set for the stream (before the call).
+	parameter of the stream which is related to the minimum number of characters used to display a value.
+	If the value requires fewer characters, then it’s specified by width, and the rest of the spaces are filled with the value of field fill of the mentioned stream.
+	width resets after each value displayment.
+
+	fill:
+		char fill ( ) const;
+		char fill ( char fillch );
+	Both variants return the current value of the fill field (presented before the call to fill()) .
+
+	cout.setf(ios::left, ios::adjustfield); - left, right, internal, default
+	left - value to display at left, rest - value to display at right
+
+	precision:
+	streamsize precision ( ) const;
+	streamsize precision ( streamsize prec );
+
+	The function precision() is used to set the number of digits displayed for a floating-point value. This number of digits is interpreted a little differently, depending on the value of the floatfield flags.
+
+	if none scientific nor fixed flag is set than it's maximum digits to display including before and after comma.
+	If they are set than it specifies the number of digits after comma.
+
+	If ferwer digits than needed than simple rounding is applied. 
+	Default: no fillng, scientfic notation if no enough space (only digits before e counts)
+	Fixed: filing after comma
+	Scientific: notation, digits after comma counts
+
+	FLAGS:
+	used to modificate and control streams
+		- they are all of type ios_base::fmtflags
+		- masks basefield, flotfield, adjsutfield
+			- to set mask use two args setf f.e. setf(ios::left, ios::adjustfield), only one flag in mask is set
+
+	flags - zwraca ustawienie mask
+	flags(arg) - ustawia wszystkie na arg i zwraca poprzednie
+
+	unsetf(mask) - clears all flags specified by mask
+
+		Flags examples:
+			showbase - for hex shows 0x, for oct shows 0
+			boolalpha - booleans as true and false
+			showpos - shows + and -
+			showpoint - always show comma in floats
+
+	Input/Output manipulators (np. endl):
+		- <iomanip>
+		- 4 groups of manipulators:
+			Independent flags, basefield, floatfield, adjustfield:
+				ios_base& manipulator ( ios_base& str );
+				<<dec, <<fixed itd.
+
+				Input manipulators
+				istream& manipulator ( istream& is );
+				ws - extract whitespaces
+
+				Output manipulator:
+				ostream& manipulator ( ostream& os );
+				endl, ends (null char), flush
+
+				Parameterized manipulators:
+				smanip setiosflags ( ios_base::fmtflags mask );
+				smanip resetiosflags ( ios_base::fmtflags mask );
+				smanip setbase ( int base ); - basefieldflag ex: 10,8,16
+				smanip setfill ( char c );
+				smanip setprecision ( int n );
+				smanip setw ( int n );
+
+			- may be Parameterized and non Parameterized (without parentheses)
+
+	isrtream:
+		- Internal flags( sets in certain situtions):
+			- Flag (an error situation)
+			- eofbit (the end of the file is reached) - sometimes sets failbit
+			- failbit ( something went wrong and the input canot be handled well)
+			- badbit - other error
+		- reads only to whitespace 
+			- or to value of flag/manipulator witdh - reads width-1 and add null termination sign
+
+		- get:
+			- int get(); - get one character
+			istream& get ( char& c ); - get one character and store it in c
+			istream& get ( char* s, streamsize n ); - get n-1 characters
+			istream& get ( char* s, streamsize n, char delim ); - get n-1 or until delim is found (default \n, without it)
+		- getline<istream>:
+			- the same as last two variants of get but it also extracts delimiting character
+		- getline<string>
+			- istream& getline (istream& is, string& str, char delim);
+			- istream& getline (istream& is, string& str); - get from istream to the str 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+File streams:
+	- 
+	ifsrtream:
+		- header: <fsrtream>
+		- derives from istream
+		- constructor: 
+			- ifstream(filename, ios_base::openmode mode)
+				- mode could be: 
+					- app(end)
+					- ate(nd)
+					- binary (treats data as binary)
+					- in (input only) 
+					- out (output only)
+					- trunc(tate) - discards the contents of the file and set its length to 0 after the opening.
+		- methods:
+			- open - like constructor - default mode in for ifstream and out for ofstream
+			- bool is_open() - is any opened file associated with ifstream
+			- close
+		- while(file >> v) || while(file.good()) {file >> v;
+	flags reading methods: good(), eof(), fail(), bad():
+		- fail() - checks two flags: badbit and failbit;
+			failbit is set when there has been an error (other than end-of-file) during the most recent input/output operation, but there’s still a possibility to perform other input/output operations.
+		- bad() - checks badbit
+			badbit is set when there was an error during the previous input/output operation, and the problem was so severe that the stream has lost its integrity – no further I/O operations are possible.
+		- eof() - checks eofbit
+		- good()- goodbit is set only if all others are false
+	ofstream:
+		- simillar to ifstream
+		- open and constuctors create files if there is any of that name
+	fstream:
+		- methods and usage of combined ifsrtream and ofstream
+	strignstream:
+		- the same methods as fstreams BUT:
+			- constructor different:
+				- no defaults
+				- takes only mode (default in and out)
+				- or takes that mode and &string - just to initiaize stream
+			- str()
+				- 1st variant: creates string based on stringstream object
+				- 2nd variant: creates string based on &string argument
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Templates:
+	functions:
+		- example: 
+			template<class T> - almandatory, class or typename - doesn't matter
+			T add(T a, T b)
+			{
+				cout<<"Template function!"<<endl;
+				return a + b;
+			}
+			cout << add(5, 10) << endl;
+
+		The compiler doesn’t generate code from a template for each possible type, but only for those types which are actually used to instantiate a template.
+
+		you cannot place a declaration (function or class) in one file and its definition in the other
+		compiler does not know code in other compilation unit when it compiles some other unit
+
+		Another probem is that usage correctness for certain types cannot be checked before generation
+
+		Specialized templates:
+			- template<> (optional) and normal function for some type in case of that type template has to be generated
+	
+	classes:
+		- before class declaration template keyword usage
+		- outside the class definitions has to be preceeded by template as well (even if method is not paramethrized)
+		- every usage of class name must be changed to use the template, for example: vector<int> vec;
+		- constructor and destuctor names are without parameters
+		- calling methods is the same as usual
+		- specialized method in class: 
+			template<> and then method preceeded by Class<chosenType>
+			- template method in template class example:
+				- 	template <class T>    // class template
+					template <class U>    // member function template
+					void Array<T>::convertTo(Array<U> & dest){...}
+		- no matter how many specialized instances of a particular method you create, there is only one declaration for all of them.
