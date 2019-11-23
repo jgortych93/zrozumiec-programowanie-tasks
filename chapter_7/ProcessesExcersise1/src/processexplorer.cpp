@@ -1,5 +1,7 @@
 #include "processexplorer.h"
 
+#include <algorithm>
+
 #define PROC_DIR_PATH "/proc/"
 #define ERROR_MESSAGE "PROC DIR CANNOT BE OPENED"
 
@@ -12,11 +14,13 @@ void ProcessExplorer::getProcessesInfo() const
     {
         while( nullptr != (entry = readdir( dir )) )
         {
-            ProcessInfo* procInfo = new ProcessInfo();
-            procInfo->name = this->getProcessName( entry );
+            if( isStringNumeric( entry->d_name ) )
+            {
+                ProcessInfo procInfo;
+                procInfo.pid = entry->d_name;
 
-            this->displayInfo( procInfo );
-            delete procInfo;
+                this->displayInfo( procInfo );
+            }
         }
     }
     else
@@ -25,12 +29,17 @@ void ProcessExplorer::getProcessesInfo() const
     }
 }
 
-string ProcessExplorer::getProcessName(const struct dirent *entry) const
+string ProcessExplorer::getProcessName( const struct dirent& entry ) const
 {
-    return entry->d_name;
+    return entry.d_name;
 }
 
-void ProcessExplorer::displayInfo( ProcessInfo* procInfo ) const
+void ProcessExplorer::displayInfo( const ProcessInfo& procInfo ) const
 {
-    cout<<"Process id: "<<procInfo->name<<endl;
+    cout<<"Process id: "<<procInfo.pid<<endl;
+}
+
+bool ProcessExplorer::isStringNumeric( const string &dirName ) const
+{
+    return find_if( dirName.begin(), dirName.end(), []( char c ) { return !isdigit( c ); } ) == dirName.end();
 }

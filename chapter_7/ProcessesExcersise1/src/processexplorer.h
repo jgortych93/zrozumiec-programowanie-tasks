@@ -14,8 +14,9 @@ class ProcessExplorer
 public:
     void getProcessesInfo() const;
 private:
-    void displayInfo( ProcessInfo* procInfo ) const;
-    string getProcessName(const struct dirent* entry) const;
+    void displayInfo( const ProcessInfo& procInfo ) const;
+    string getProcessName( const struct dirent& entry ) const;
+    bool isStringNumeric( const string& dirName ) const;
 
 };
 
