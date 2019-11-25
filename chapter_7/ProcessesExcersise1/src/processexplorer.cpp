@@ -65,12 +65,12 @@ void ProcessExplorer::displayInfo( const ProcessInfo& procInfo ) const
     //cout<<"\tName: "<<procInfo.name<<endl;
 }
 
-bool ProcessExplorer::isStringNumeric( const string &dirName ) const
+bool ProcessExplorer::isStringNumeric( const string& dirName ) const
 {
     return find_if( dirName.begin(), dirName.end(), []( char c ) { return !isdigit( c ); } ) == dirName.end();
 }
 
-void ProcessExplorer::displayProcessStatus(const struct dirent &entry) const
+void ProcessExplorer::displayProcessStatus( const struct dirent& entry ) const
 {
     ifstream inputFile;
     string commFilePath( PROC_DIR_PATH );
