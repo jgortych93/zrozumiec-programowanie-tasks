@@ -17,7 +17,7 @@ private:
     void displayInfo( const ProcessInfo& procInfo ) const;
     string getProcessName( const struct dirent& entry ) const;
     bool isStringNumeric( const string& dirName ) const;
-
+    void displayProcessStatus( const struct dirent& entry ) const;
 };
 
 #endif // PROCESSEXPLORER_H

@@ -10,6 +10,7 @@
 #define PROC_DIR_PATH "/proc/"
 #define PROC_NO_ACCESS_MESSAGE "PROC DIR CANNOT BE OPENED"
 #define COMM_FILE_NO_ACCESS_MESSAGE "Comm file cannot be opened"
+#define STATUS_FILE_NO_ACCESS_MESSAGE "Status file cannot be opened"
 
 
 void ProcessExplorer::getProcessesInfo() const
@@ -25,9 +26,9 @@ void ProcessExplorer::getProcessesInfo() const
             {
                 ProcessInfo procInfo;
                 procInfo.pid = entry->d_name;
-                procInfo.name = this->getProcessName( *entry );
 
                 this->displayInfo( procInfo );
+                this->displayProcessStatus( *entry );
             }
         }
     }
@@ -61,10 +62,33 @@ string ProcessExplorer::getProcessName( const struct dirent& entry ) const
 void ProcessExplorer::displayInfo( const ProcessInfo& procInfo ) const
 {
     cout<<"Process id: "<<procInfo.pid<<endl;
-    cout<<"\tName: "<<procInfo.name<<endl;
+    //cout<<"\tName: "<<procInfo.name<<endl;
 }
 
 bool ProcessExplorer::isStringNumeric( const string &dirName ) const
 {
     return find_if( dirName.begin(), dirName.end(), []( char c ) { return !isdigit( c ); } ) == dirName.end();
+}
+
+void ProcessExplorer::displayProcessStatus(const struct dirent &entry) const
+{
+    ifstream inputFile;
+    string commFilePath( PROC_DIR_PATH );
+    commFilePath.append( entry.d_name );
+    commFilePath.append( "/status" );
+    inputFile.open( commFilePath );
+    if( inputFile.is_open() )
+    {
+        string line;
+        while( getline( inputFile, line ) )
+        {
+            cout<<"\t"+line<<endl;
+        }
+        inputFile.close();
+    }
+    else
+    {
+        cerr<<STATUS_FILE_NO_ACCESS_MESSAGE<<endl;
+        throw runtime_error( STATUS_FILE_NO_ACCESS_MESSAGE );
+    }
 }
