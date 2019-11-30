@@ -1,0 +1,1 @@
+Simple debugger that watches the chosen process and prints process events.
