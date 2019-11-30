@@ -4,4 +4,11 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp
+        src/debugger.cpp \
+        src/main.cpp
+
+DISTFILES += \
+    README.MD
+
+HEADERS += \
+    src/debugger.hpp
