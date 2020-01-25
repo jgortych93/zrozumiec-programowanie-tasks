@@ -12,8 +12,8 @@ public:
     Debugger( const string &path );
     void startDebugging() const;
 private:
-    void handleChildProcess() const;
-    void handleParentProcess() const;
+    void handleChildProcess( const pid_t &pid ) const;
+    void handleParentProcess( const pid_t &pid ) const;
 };
 
 #endif // DEBUGGER_HPP
