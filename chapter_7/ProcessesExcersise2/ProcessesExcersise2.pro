@@ -11,4 +11,6 @@ DISTFILES += \
     README.MD
 
 HEADERS += \
-    src/debugger.hpp
+    src/debugger.hpp \
+    src/registry_read_instructions.hpp
+    src/registry_read_instructions.hpp
