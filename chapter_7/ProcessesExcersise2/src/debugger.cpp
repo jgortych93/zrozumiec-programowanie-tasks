@@ -1,9 +1,17 @@
 #include "debugger.hpp"
+#include "registry_read_instructions.hpp"
 
+#include <iostream>
+
+#include <sys/syscall.h>
 #include <stdexcept>
 #include <sys/ptrace.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
+#include <sys/user.h>
+
+using namespace std;
 
 #define FORK_ERROR "Creating child process failed."
 #define PTRACE_ERROR "ptrace call failed"
@@ -48,5 +56,22 @@ void Debugger::handleChildProcess( const pid_t &pid ) const
 
 void Debugger::handleParentProcess( const pid_t &pid ) const
 {
+    struct user_regs_struct regs;
+    int status;
+    long lastCall;
+
+    while( waitpid( pid, &status, 0 ) && !WIFEXITED( status ) )
+    {
+        ptrace( PTRACE_GETREGS, pid, NULL, &regs );
+        lastCall = LASTCALL( regs );
+
+        if( SYS_write == lastCall )
+        {
+            cout<<"Process id: "<<pid<<" - syscall write: "<<lastCall<<endl;
+            cout<<"File descriptor: "<<FD( regs )<<"------ Text buffer: "<<TEXT_ADDRESS( regs )<<"------ Text size: "<< COUNT( regs )<<endl;
+        }
+        ptrace(PTRACE_SYSCALL, pid, NULL, NULL);
+
+    }
 
 }
