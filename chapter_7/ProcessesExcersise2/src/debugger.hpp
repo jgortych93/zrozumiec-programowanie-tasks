@@ -7,14 +7,13 @@ using namespace std;
 
 class Debugger
 {
-    const int processToBeDebugged;
+    const string processPath;
 public:
-    Debugger( const int &pid );
+    Debugger( const string &path );
     void startDebugging() const;
 private:
     void handleChildProcess( const pid_t &pid ) const;
     void handleParentProcess( const pid_t &pid ) const;
-    const char* readProcessPath() const;
 };
 
 #endif // DEBUGGER_HPP

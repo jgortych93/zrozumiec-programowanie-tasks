@@ -7,13 +7,11 @@ using namespace std;
 
 int main()
 {
-    cout<<"Please enter input program pid: "<<endl;
-    string pidString;
-    std::getline( cin, pidString );
+    cout<<"Please enter input program path: "<<endl;
+    string path;
+    std::getline( cin, path );
 
-    int pid = stoi( pidString );
-
-    Debugger debugger( pid );
+    Debugger debugger( path );
     debugger.startDebugging();
 
     return 0;
