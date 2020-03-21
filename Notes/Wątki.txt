@@ -1,0 +1,99 @@
+﻿Przyjmowaniem wątków zajmuje się scheduler
+Wywłaszcza Z zapisaniem kontraktu i przydziela nowy z wczytaniem kontekstu.
+
+
+Wątki mogą być wywłaszczone po minięciu przydzielonego czasu, lub kiedy na coś oczekują lub jest na nich wywołany sleep.
+
+
+Wątki, które nie oczekują i najczęściej wykonują skomplikowane obliczenia są nazywane CPU bound i są wymagające dla procesora. 
+Program może mieć wiele wątków, ale najlepiej wtedy aby były I/O bound. 
+
+
+Kontekst wątku
+Zestaw rejestrów zawierających informacje o newralgicznych elementach.
+
+
+Informacje specyficzne
+stos wątku 
+zmienne lokalne dla wątku
+
+
+W Winapi
+Miedzywatkowa komunikacja może przebiegać przez ustawianie eventów typu HANDLE. 
+GetThreadContext i SetThreadContext 
+
+
+CONTEXT i user_regs_struct
+
+
+Wątki mogą dzielić się na włókna. Wtedy wątek wykorzystuje cały kwant, a włókna same decydują kiedy i na jakie inne włókno się przełączyć. Również mają swój kontekst i stos. Mogą być szybsze.
+Są w Winapi, boost i python
+
+
+Synchronizacja:
+Race condition - gdzie nie ma pewności o tym co wykona daną operację pierwsze, konkretny błąd w tym przypadku to Time of check to Time of use.
+
+
+Czas sprawdzenia i czas użycia trzeba łączyć w jedną atomową operację 
+
+
+Manualną synchronizacja jest błędem ze względu na to, że architektury, kompilator i języki nie gwarantują określonej kolejności wykonania działań, operacji ma pamięci i kolejności wywołań funkcji.
+
+
+Spinlock to pętla blokująca wciąż oczekująca na pewnien warunek. Zapis i odczyt warunku musi być atomowy. Należy także zabezpieczyć tą zmienną przed optymalizacją. Bardziej wydajna jest w wariancie z usypianiem wątku oczekujacego. Uzywabe raczej w programowaniu niskopoziomowym.
+Wykorzystywany np. W Posix ( pthread_spin_lock )i C# (SpinLock).
+
+
+Gotowe mechanizmy synchronizacji:
+
+
+Bariera pamięci jest stawiana w odpowiednim miejscu w kodzie i gwarantuje, że dalsza część kodu się nie wykona dopóki nie wykonają się wszystkie poprzednie instrukcje
+Przyklad: atomic_thread_fence w C i cpp 11
+
+
+Atomowa czyli niepodzielna operacja, której całkowity efekt jest obserwowalny dopiero w całości. Atomowymi operacjami są na przykład operacje zapisu wyrównane natutalnie, czyli zapis całego x-bajtowego słowa na właściwym adresie ( aby nie musieć przechodzić na następny adres). 
+Przykład:
+Typ _Atomic C11
+Szablon std::atomic<> cpp 11
+Fukcje atomic_fetch_add, atomic_compare_exchange_strong w c11
+
+
+Pamięć interlocked określa, że żaden inny logiczny procesor nie może mieć dostępu do danego adresu pamięci. Np. lock w x86 assembler.
+
+
+Mutexy:
+Zapewniają dostęp do chronionego zasobu tylko jednemu watkowi na raz. Moga byc w stanie zaketym lub wolnym. Watek usilajucy zająć zajęty mutex musi poczekac na jego ,zwolnienie ale jest wtedy najczęściej poddany, nie zajmuje więc czasu procesora i stąd jest lepszy od spinlock.
+Należy samemu zadbać o to by dostęp do chronionego obiektu, był zawsze chroniony przez muteksy.
+
+
+Mechanizm RAII gwarantuje zwolnienie mutexu na końcu bloku. (synchronized w java np.). 
+
+
+Mutexy typu reader writer- wiele wątków doczytujacych może wejść do sekcji krytycznej, ale tylko kiedy nie jest zajęta przez pisarza. W sytuacjach kiedy wiele wątków chce czytać, ale rzadko jest zapis.
+
+
+Inne rodzaje muteksow:
+Semafory - określają liczbę wątków które mogą wejść do sekcji.
+Z prioretyzacja obsługi wątków.
+Reentrant - pozwalają wątków od razu przed zwolnieniem wejść z powrotem.
+
+
+Zdarzenia:
+Synchronizujacy obiekt, na którego sygnał ( aktywacja przez inny watek) może oczekiwać wiele naraz wątków.
+
+
+
+
+Zmienne warunkowe:
+W działaniu są podobne do zdarzeń, ale przechowują listę oczekujących wątków. Stąd na producencie leży odpowiedzialność za wybudzanie wątków i może zdecydować ile wątków ma zostać wybudzonych. Konsument natomiast po otrzymaniu danych ma wywołać wait na zmiennej. Dodatkowo każde użycie zmiennej powinno być chronione muteksem.
+
+
+Kłopoty z synchronizacja:
+Deadlock:
+Sytuacja, w której program zakleszcza się i nie może kontynuować działania że względu na to iż jeden lub więcej wątków oczekuje na blokadę, która nie zostanie zdjeta. Na przyklad:
+Muteks nie zostaje zwolniony po operacji na pamięci. 
+Wątki zajmują te same blokady w innej kolejności i zakleszczaja się nawzajem.
+Przegapienie powiadomienia w pętli oczekującej. Wtedy np. odczytaj dane jako konsument i dopiero kiedy ich nie ma wywołać wait.
+Mechanizmy zabezpieczające: RAII, adnotacje jak GUARDED BY, std:lock który może zajmować wiele muteksow na raz i wykrywa Deadlock, zajmowanie blokad zawsze w tej samej kolejności. 
+Zagłodzenie:
+Występuje w przypadku kiedy pewne wątki niewspółmiernie wykorzystują czas procesora i niektóre z nich mogą go dostawać bardzo mało lub w ogóle, w szczególności w sytuacji, w której stosowana jest prioretyzacja ( tu może pomóc aging, czyli zwiększanie priorytetu wątku wraz z czasem oczekiwania ) lub np. kiedy wątki odpalają się na jednym rdzeniu fizycznym i nie jest to obsłużona sytuacja.
