@@ -8,6 +8,7 @@
 
 int main()
 {
+    //First example shows that non synchronized operations are untrusty as the result cannot be predicted
     NonSynchronizedAccessExample firstProblem;
     firstProblem.RunTest();
 }
