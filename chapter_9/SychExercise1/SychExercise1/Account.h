@@ -8,7 +8,7 @@ public:
     Account(const int64_t& startupCapital);
     ~Account();
 
-    void TransformAmountTo(const int64_t& amount, Account& targetAccount);
+    void TransformAmountTo(int64_t amount, Account& targetAccount);
     void TransformAmountToSynchronized(const int64_t& amount, Account& targetAccount);
     void LockAccountMutex();
     void UnlockAccountMutex();

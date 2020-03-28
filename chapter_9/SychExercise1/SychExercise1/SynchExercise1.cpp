@@ -15,7 +15,7 @@ int main()
     cout << "Please choose which example to show: " << endl;
     cout << "First example shows that non synchronized operations are untrusty as the result cannot be predicted" << endl;
     cout << "Second example shows the risk of thread deadlocking while two mutexes are being locked by different threads in opposite orders" << endl;
-    uint8_t chosenOption = 0U;
+    int chosenOption;
     cin >> chosenOption;
 
     switch (chosenOption)
@@ -30,14 +30,14 @@ int main()
     {
         Account firstAccount(30000);
         Account secondAccount(50000);
-        thread *firstThread = new thread(&Account::TransformAmountTo, &firstAccount, 10000, secondAccount);
-        thread *secondThread = new thread(&Account::TransformAmountTo, &secondAccount, 55000, firstAccount);
+        thread *firstThread = new thread(&Account::TransformAmountTo, &firstAccount, 10000, std::ref(secondAccount));
+        thread *secondThread = new thread(&Account::TransformAmountTo, &secondAccount, 55000, std::ref(firstAccount));
 
         firstThread->join();
         secondThread->join();
 
         delete firstThread;
-        delete secondThread;
+        delete secondThread;    
         break;
     }
     default:
