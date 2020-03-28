@@ -22,6 +22,16 @@ void Account::TransformAmountTo(const int64_t & amount, Account& targetAccount)
     this->UnlockAccountMutex();
 }
 
+void Account::TransformAmountToSynchronized(const int64_t & amount, Account & targetAccount)
+{
+    std::lock(this->accountMutex, targetAccount.accountMutex);
+    std::lock_guard<std::mutex> lockFrom(this->accountMutex, std::adopt_lock);
+    std::lock_guard<std::mutex> targetLock(targetAccount.accountMutex, std::adopt_lock);
+
+    this->balance -= amount;
+    targetAccount.balance += amount;
+}
+
 void Account::UnlockAccountMutex()
 {
     this->accountMutex.unlock();

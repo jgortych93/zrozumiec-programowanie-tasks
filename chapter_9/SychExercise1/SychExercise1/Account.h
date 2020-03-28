@@ -9,11 +9,10 @@ public:
     ~Account();
 
     void TransformAmountTo(const int64_t& amount, Account& targetAccount);
+    void TransformAmountToSynchronized(const int64_t& amount, Account& targetAccount);
     void LockAccountMutex();
     void UnlockAccountMutex();
     int64_t balance;
-
-private:
     std::mutex accountMutex;
 };
 
