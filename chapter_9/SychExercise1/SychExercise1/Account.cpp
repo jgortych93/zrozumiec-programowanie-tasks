@@ -15,10 +15,10 @@ void Account::TransformAmountTo(int64_t amount, Account& targetAccount)
     this->LockAccountMutex();
     this->balance -= amount;
 
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
     targetAccount.LockAccountMutex();
     targetAccount.balance += amount;
-
-    std::this_thread::sleep_for(std::chrono::seconds(2));
 
     targetAccount.UnlockAccountMutex();
     this->UnlockAccountMutex();
