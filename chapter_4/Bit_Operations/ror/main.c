@@ -25,7 +25,7 @@ unsigned char rotate_left(unsigned char number)
     result <<= 1;
 
     if (firstBit)
-        result |= firstBit;
+        result |= 1;
 
     return result;
 
@@ -34,13 +34,11 @@ unsigned char rotate_left(unsigned char number)
 int main()
 {
     unsigned char number;
-    printf("Give your number (from 0 to 255\n");
+    printf("Give your number (from 0 to 255\n)");
     scanf("%hhu", &number);
 
-
     printf("Right rotated number is: %hhu\n", rotate_right(number));
-    printf("left rotated number is: %hhu\n", rotate_left(number));
-
+    printf("Left rotated number is: %hhu\n", rotate_left(number));
 
     return 0;
 }
